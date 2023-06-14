@@ -1,19 +1,27 @@
 import { Component } from 'react';
-import { Form, Label, Input, Button } from './Phonebook.styled';
+import {
+  FormPhone,
+  FieldPhone,
+  ButtonPhone,
+  NameInput,
+  ErrorValidate,
+} from './Phonebook.styled';
+import * as Yup from 'yup';
+import 'yup-phone-lite';
+import { Formik, ErrorMessage } from 'formik';
 import PropTypes from 'prop-types';
 import { nanoid } from 'nanoid';
 
 class Phonebook extends Component {
-  state = { name: '', number: '' };
+  scheme = Yup.object().shape({
+    name: Yup.string().required('Required!'),
+    number: Yup.string()
+      .phone('UA', 'Number is not valid')
+      .required('Required!'),
+  });
 
-  handleChange = ({ target }) => {
-    this.setState({ [target.name]: target.value });
-  };
-
-  handleSubmit = async e => {
-    e.preventDefault();
-
-    const { name, number } = this.state;
+  handleSubmit = async (data, helpers) => {
+    const { name, number } = data;
 
     const isResetForm = this.props.getContacts({
       name,
@@ -21,38 +29,32 @@ class Phonebook extends Component {
       id: nanoid(),
     });
 
-    (await isResetForm) && this.setState({ name: '', number: '' });
+    (await isResetForm) && helpers.resetForm();
   };
 
   render() {
     return (
-      <Form onSubmit={this.handleSubmit}>
-        <Label htmlFor="name">
-          Name
-          <Input
-            onChange={this.handleChange}
-            type="text"
-            name="name"
-            value={this.state.name}
-            id="name"
-            required
-          />
-        </Label>
-        <Label htmlFor="number">
-          Number
-          <Input
-            id="number"
-            type="tel"
-            name="number"
-            pattern="(\+?[0-9]{1,2}?\s?[0-9]{2}\s?[0-9]{3}\s?[0-9]{4,5}$)"
-            title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-            onChange={this.handleChange}
-            value={this.state.number}
-            required
-          />
-        </Label>
-        <Button type="submit">Add Contact</Button>
-      </Form>
+      <Formik
+        initialValues={{ name: '', number: '' }}
+        onSubmit={this.handleSubmit}
+        validationSchema={this.scheme}
+      >
+        <FormPhone>
+          <NameInput>Name</NameInput>
+          <FieldPhone type="text" name="name" />
+          <ErrorMessage name="name">
+            {msg => <ErrorValidate>{msg}</ErrorValidate>}
+          </ErrorMessage>
+
+          <NameInput>Number</NameInput>
+          <FieldPhone type="tel" name="number" />
+          <ErrorMessage name="number">
+            {msg => <ErrorValidate>{msg}</ErrorValidate>}
+          </ErrorMessage>
+
+          <ButtonPhone type="submit">Add Contact</ButtonPhone>
+        </FormPhone>
+      </Formik>
     );
   }
 }

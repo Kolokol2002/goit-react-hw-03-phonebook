@@ -38,10 +38,17 @@ class App extends Component {
       ).length;
 
       if (isEmpty === 0) {
+        toast.success(`${userData.name}, success add!`, {
+          hideProgressBar: true,
+          autoClose: 2000,
+          theme: 'dark',
+        });
         return { contacts: [...contacts, userData] };
       } else {
         toast.warn(`${userData.name}, already exist in phonebook!!!`, {
-          icon: '❗',
+          hideProgressBar: true,
+          autoClose: 2000,
+          theme: 'dark',
         });
         isResetForm = false;
       }
