@@ -33,23 +33,35 @@ class App extends Component {
     let isResetForm = true;
 
     await this.setState(({ contacts }) => {
-      const isEmpty = contacts.filter(
+      const isEmptyName = contacts.filter(
         ({ name }) => name === userData.name
       ).length;
 
-      if (isEmpty === 0) {
+      const isEmptyNumber = contacts.filter(
+        ({ number }) => number === userData.number
+      ).length;
+
+      if (!isEmptyName && !isEmptyNumber) {
         toast.success(`${userData.name}, success add!`, {
           hideProgressBar: true,
           autoClose: 2000,
           theme: 'dark',
         });
         return { contacts: [...contacts, userData] };
-      } else {
-        toast.warn(`${userData.name}, already exist in phonebook!!!`, {
-          hideProgressBar: true,
-          autoClose: 2000,
-          theme: 'dark',
-        });
+      }
+
+      if (isEmptyName || isEmptyNumber) {
+        toast.warn(
+          `${
+            (isEmptyName && userData.name) || (isEmptyNumber && userData.number)
+          }, already exist in phonebook!!!`,
+          {
+            hideProgressBar: true,
+            autoClose: 2000,
+            theme: 'dark',
+          }
+        );
+
         isResetForm = false;
       }
     });
@@ -58,7 +70,6 @@ class App extends Component {
   };
 
   handleFilter = ({ target }) => {
-    console.log();
     this.setState({ filter: target.value });
   };
 
