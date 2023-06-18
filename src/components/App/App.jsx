@@ -34,7 +34,7 @@ class App extends Component {
 
     await this.setState(({ contacts }) => {
       const isEmptyName = contacts.filter(
-        ({ name }) => name === userData.name
+        ({ name }) => name.toLowerCase() === userData.name.toLowerCase()
       ).length;
 
       const isEmptyNumber = contacts.filter(
